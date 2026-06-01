@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basic Calculator</title>
+  <style>
+    body {
+      font-family: -apple-system, system-ui, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .calculator {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      width: 280px;
+    }
+    .display {
+      width: 100%;
+      height: 64px;
+      font-size: 32px;
+      text-align: right;
+      border: none;
+      background: #1c1c1e;
+      color: #fff;
+      border-radius: 10px;
+      padding: 0 16px;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      height: 56px;
+      font-size: 22px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #e9e9eb;
+      transition: filter 0.1s;
+    }
+    button:hover { filter: brightness(0.95); }
+    button:active { filter: brightness(0.9); }
+    .op { background: #ff9500; color: #fff; }
+    .equals { background: #34c759; color: #fff; }
+    .clear { background: #ff3b30; color: #fff; }
+    .span-two { grid-column: span 2; }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" class="display" id="display" value="0" readonly />
+    <div class="buttons">
+      <button class="clear span-two" onclick="clearAll()">C</button>
+      <button class="op" onclick="chooseOp('/')">÷</button>
+      <button class="op" onclick="chooseOp('*')">×</button>
+
+      <button onclick="appendNumber('7')">7</button>
+      <button onclick="appendNumber('8')">8</button>
+      <button onclick="appendNumber('9')">9</button>
+      <button class="op" onclick="chooseOp('-')">−</button>
+
+      <button onclick="appendNumber('4')">4</button>
+      <button onclick="appendNumber('5')">5</button>
+      <button onclick="appendNumber('6')">6</button>
+      <button class="op" onclick="chooseOp('+')">+</button>
+
+      <button onclick="appendNumber('1')">1</button>
+      <button onclick="appendNumber('2')">2</button>
+      <button onclick="appendNumber('3')">3</button>
+      <button class="equals" onclick="calculate()">=</button>
+
+      <button class="span-two" onclick="appendNumber('0')">0</button>
+      <button onclick="appendNumber('.')">.</button>
+      <button onclick="backspace()">⌫</button>
+    </div>
+  </div>
+
+  <script>
+    let current = '0';
+    let previous = null;
+    let operator = null;
+    let resetNext = false;
+
+    const display = document.getElementById('display');
+
+    function updateDisplay() {
+      display.value = current;
+    }
+
+    function appendNumber(num) {
+      if (resetNext) {
+        current = '0';
+        resetNext = false;
+      }
+      if (num === '.' && current.includes('.')) return;
+      if (current === '0' && num !== '.') {
+        current = num;
+      } else {
+        current += num;
+      }
+      updateDisplay();
+    }
+
+    function chooseOp(op) {
+      if (operator !== null && !resetNext) calculate();
+      previous = current;
+      operator = op;
+      resetNext = true;
+    }
+
+    function calculate() {
+      if (operator === null || previous === null) return;
+      const a = parseFloat(previous);
+      const b = parseFloat(current);
+      let result;
+      switch (operator) {
+        case '+': result = a + b; break;
+        case '-': result = a - b; break;
+        case '*': result = a * b; break;
+        case '/':
+          result = b === 0 ? 'Error' : a / b;
+          break;
+      }
+      current = String(result);
+      operator = null;
+      previous = null;
+      resetNext = true;
+      updateDisplay();
+    }
+
+    function clearAll() {
+      current = '0';
+      previous = null;
+      operator = null;
+      resetNext = false;
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (resetNext) return;
+      current = current.length > 1 ? current.slice(0, -1) : '0';
+      updateDisplay();
+    }
+  </script>
+</body>
+</html>
